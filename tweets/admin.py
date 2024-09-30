@@ -7,7 +7,7 @@ class TweetAdmin(admin.ModelAdmin):
     list_display = (
         "user",
         "payload",
-        "count_likes",
+        "likes",
         "created_at",
         "updated_at",
     )
@@ -18,6 +18,6 @@ class LikeAdmin(admin.ModelAdmin):
     list_display = (
         "user",
         "tweet",
-        "craeted_at",
+        "created_at",
         "updated_at",
     )
