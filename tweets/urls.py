@@ -2,4 +2,7 @@ from django.contrib import admin
 from django.urls import path
 from . import views
 
-urlpatterns = [path("", views.see_all_tweets)]
+urlpatterns = [
+    path("", views.Tweets.as_view()),
+    path("<int:tweet_id>", views.TweetDetail.as_view()),
+]
