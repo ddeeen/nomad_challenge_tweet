@@ -1,6 +1,5 @@
 from .models import Tweet
 from rest_framework.response import Response
-from rest_framework.decorators import api_view
 from .serializer import TweetSerializer
 from rest_framework.views import APIView
 from rest_framework.exceptions import NotFound

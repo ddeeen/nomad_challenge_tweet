@@ -1,5 +1,4 @@
 from rest_framework import serializers
-from users.models import User
 from .models import Tweet
 
 
@@ -18,4 +17,4 @@ class TweetSerializer(serializers.ModelSerializer):
     class Meta:
         model = Tweet
         fields = ["payload", "user", "likes", "created_at"]
-        read_only_fields = ["likes", "created_at"]
+        read_only_fields = ["user", "likes", "created_at"]
