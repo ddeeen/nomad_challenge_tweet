@@ -11,6 +11,8 @@ from . import serializers
 
 class Users(APIView):
 
+    permission_classes = [IsAuthenticated]
+
     def get(self, request):
         users = User.objects.all()
         serializer = serializers.TinyUserSerializer(users, many=True)
