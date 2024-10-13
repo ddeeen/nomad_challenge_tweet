@@ -2,7 +2,7 @@ from .models import Tweet
 from rest_framework.response import Response
 from .serializer import TweetSerializer
 from rest_framework.views import APIView
-from rest_framework.exceptions import NotFound
+from rest_framework.exceptions import NotFound, PermissionDenied
 from rest_framework.status import HTTP_400_BAD_REQUEST, HTTP_204_NO_CONTENT
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
 
@@ -43,17 +43,17 @@ class TweetDetail(APIView):
     def put(self, request, tweet_id):
         tweet = self.get_object(tweet_id)
         if tweet.user != request.user:
-            raise PermissionError
+            raise PermissionDenied
         serializer = TweetSerializer(tweet, data=request.data)
         if serializer.is_valid():
             updated_tweet = serializer.save()
             return Response(TweetSerializer(updated_tweet).data)
         else:
-            return Response(serializer.errors)
+            return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
 
     def delete(self, request, tweet_id):
         tweet = self.get_object(tweet_id)
         if tweet.user != request.user:
-            raise PermissionError
+            raise PermissionDenied
         tweet.delete()
-        return Response(HTTP_204_NO_CONTENT)
+        return Response(status=HTTP_204_NO_CONTENT)

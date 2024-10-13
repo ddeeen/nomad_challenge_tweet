@@ -82,3 +82,84 @@ class TestTweets(APITestCase):
         self.assertEqual(
             len(response.data), 2, "test_tweets: 데이터의 개수가 2이 아닙니다"
         )
+
+
+class TestTweetDetail(APITestCase):
+
+    URL = "http://127.0.0.1:8000/api/v1/tweets/"
+    PAYLOAD_1 = "tweet detail test 1"
+    PAYLOAD_2 = "tweet detail test 2"
+
+    def setUp(self):
+        # user 생성
+        # tweet 1개 생성
+        user = User.objects.create(username="user_other")
+        user.set_password("123")
+        user.save()
+        self.user_other = user
+        user = User.objects.create(username="user_tweet")
+        user.set_password("123")
+        user.save()
+        self.client.force_login(
+            user,
+        )
+        self.client.post(self.URL, {"payload": "tweet detail test id 1"})
+        self.client.post(self.URL, {"payload": self.PAYLOAD_2})
+
+    def test_tweet_detail(self):
+        # get test
+        # 없는 id url
+        response = self.client.get(f"{self.URL}10")
+        self.assertEqual(response.status_code, 404, "TweetDetail: 404 필요")
+        # 있는 id url
+        url = f"{self.URL}1"
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200, "TweetDetail: 200 필요")
+
+        # put test login - 제대로 된 user - 값 제대로
+        response = self.client.put(url, {"payload": self.PAYLOAD_1})
+        self.assertEqual(response.status_code, 200, "TweetDetail: 200 필요")
+        self.assertEqual(
+            response.data.get("payload"), self.PAYLOAD_1, "TweetDetail: put 작동 이상"
+        )
+
+        # put test login - 제대로 된 user - 값 이상하게
+        response = self.client.put(url, {})
+        self.assertEqual(response.status_code, 400, "TweetDetail: 400 필요")
+
+        # delete test login - 제대로 된 user
+        response = self.client.delete(url)
+        self.assertEqual(response.status_code, 204, "TweetDetail: 204 필요")
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 404, "TweetDetail: 404 필요")
+
+        url = f"{self.URL}2"
+        self.client.logout()
+
+        # put test login 없이
+        response = self.client.put(url, {"payload": self.PAYLOAD_1})
+        self.assertEqual(response.status_code, 403, "TweetDetail put: 403 - login 필요")
+        self.assertNotEqual(response.data.get("payload"), self.PAYLOAD_1)
+
+        # delete test login 없이
+        response = self.client.delete(url)
+        self.assertEqual(
+            response.status_code, 403, "TweetDetail delete: 403 - login 필요"
+        )
+        response = self.client.get(url)
+        self.assertEqual(response.data.get("payload"), self.PAYLOAD_2)
+
+        self.client.force_login(self.user_other)
+
+        # put test login - 다른 user
+        response = self.client.put(url, {"payload": self.PAYLOAD_1})
+        self.assertEqual(response.status_code, 403, "TweetDetail put: 403, user 불일치")
+        self.assertNotEqual(response.data.get("payload"), self.PAYLOAD_1)
+
+        # delete test login - 다른 user
+        response = self.client.delete(url)
+        self.assertEqual(
+            response.status_code, 403, "TweetDetail delete: 403, user 불일치"
+        )
+        response = self.client.get(url)
+        self.assertEqual(response.data.get("payload"), self.PAYLOAD_2)
