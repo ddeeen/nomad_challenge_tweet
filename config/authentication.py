@@ -6,7 +6,6 @@ from users.models import User
 class UsernameAuthentication(BaseAuthentication):
 
     def authenticate(self, request):
-        print(request.headers)
         username = request.headers.get("X-USERNAME")
         if not username:
             return None

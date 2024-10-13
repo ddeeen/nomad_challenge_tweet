@@ -18,7 +18,6 @@ class ElonFilter(admin.SimpleListFilter):
     def queryset(self, request, tweets):
         elon_musk = "Elon Musk"
         elon = self.value()
-        print(elon)
         if elon:
             if elon == "elon_musk":
                 return tweets.filter(payload__contains=elon_musk)

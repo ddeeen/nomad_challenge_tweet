@@ -3,7 +3,7 @@ from rest_framework.response import Response
 from .serializer import TweetSerializer
 from rest_framework.views import APIView
 from rest_framework.exceptions import NotFound
-from rest_framework.status import HTTP_204_NO_CONTENT
+from rest_framework.status import HTTP_400_BAD_REQUEST, HTTP_204_NO_CONTENT
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
 
 
@@ -19,10 +19,10 @@ class Tweets(APIView):
     def post(self, request):
         serializer = TweetSerializer(data=request.data)
         if serializer.is_valid():
-            new_tweet = serializer.save()
+            new_tweet = serializer.save(user=request.user)
             return Response(TweetSerializer(new_tweet).data)
         else:
-            return Response(serializer.errors)
+            return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
 
 
 class TweetDetail(APIView):
