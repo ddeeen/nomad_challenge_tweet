@@ -3,8 +3,8 @@ from django.contrib.auth.models import AbstractUser
 
 
 class User(AbstractUser):
-  """ User Model """
+    """User Model"""
 
-  first_name = models.CharField(editable=False, max_length=150)
-  last_name = models.CharField(editable=False, max_length=150)
-  name = models.CharField(max_length=150)
+    first_name = models.CharField(editable=False, max_length=150)
+    last_name = models.CharField(editable=False, max_length=150)
+    name = models.CharField(max_length=150)
