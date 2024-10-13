@@ -1,6 +1,8 @@
 from rest_framework.response import Response
 from rest_framework.exceptions import NotFound, ParseError
 from rest_framework.views import APIView
+from rest_framework.permissions import IsAuthenticated
+from rest_framework import status
 from .models import User
 from tweets.serializer import TweetSerializer
 from . import serializers
@@ -55,3 +57,21 @@ class UserTweets(APIView):
         tweets = self.get_objects(user_id)
         serializer = TweetSerializer(tweets, many=True)
         return Response(serializer.data)
+
+
+class UserPasswordChange(APIView):
+
+    permission_classes = [IsAuthenticated]
+
+    def put(self, request):
+        user = request.user
+        old_password = request.data.get("old_password")
+        new_password = request.data.get("new_password")
+        if not old_password or not new_password:
+            raise ParseError("Input password")
+        if user.check_password(old_password):
+            user.set_password(new_password)
+            user.save()
+            return Response(status=status.HTTP_200_OK)
+        else:
+            raise ParseError("Wrong Password")
